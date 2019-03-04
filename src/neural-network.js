@@ -501,12 +501,12 @@ export default class NeuralNetwork {
    * @param {object} value
    * @param {boolean} [logErrorRate]
    */
-  trainPattern(value, logErrorRate) {
+  trainPattern({input, output}, logErrorRate) {
     // forward propagate
-    this.runInput(value.input);
+    this.runInput(input);
 
     // back propagate
-    this.calculateDeltas(value.output);
+    this.calculateDeltas(output);
     this.adjustWeights();
 
     if  (logErrorRate) {
@@ -697,7 +697,7 @@ export default class NeuralNetwork {
 
         const biasMomentumCorrection = this.biasChangesLow[layer][node] / (1 - Math.pow(trainOpts.beta1, this.iterations));
         const biasGradientCorrection = this.biasChangesHigh[layer][node] / (1 - Math.pow(trainOpts.beta2, this.iterations));
-
+        
         this.biasChangesLow[layer][node] = biasChangeLow;
         this.biasChangesHigh[layer][node] = biasChangeHigh;
         this.biases[layer][node] += trainOpts.learningRate * biasMomentumCorrection / (Math.sqrt(biasGradientCorrection) + trainOpts.epsilon);
@@ -772,12 +772,12 @@ export default class NeuralNetwork {
     return data;
   }
 
-  addFormat(data) {
-    this.inputLookup = lookup.addKeys(data.input, this.inputLookup);
+  addFormat({input, output}) {
+    this.inputLookup = lookup.addKeys(input, this.inputLookup);
     if (this.inputLookup) {
       this.inputLookupLength = Object.keys(this.inputLookup).length;
     }
-    this.outputLookup = lookup.addKeys(data.output, this.outputLookup);
+    this.outputLookup = lookup.addKeys(output, this.outputLookup);
     if (this.outputLookup) {
       this.outputLookupLength = Object.keys(this.outputLookup).length;
     }
@@ -835,19 +835,17 @@ export default class NeuralNetwork {
           falsePos++;
         }
 
-        errorSum += mse(output.map((value, i) => {
-          return target[i] - value;
-        }));
+        errorSum += mse(output.map((value, i) => target[i] - value));
       }
 
       return {
         error: errorSum / data.length,
-        misclasses: misclasses,
+        misclasses,
         total: data.length,
-        trueNeg: trueNeg,
-        truePos: truePos,
-        falseNeg: falseNeg,
-        falsePos: falsePos,
+        trueNeg,
+        truePos,
+        falseNeg,
+        falsePos,
         precision: truePos > 0 ? truePos / (truePos + falsePos) : 0,
         recall: truePos > 0 ? truePos / (truePos + falseNeg) : 0,
         accuracy: (trueNeg + truePos) / data.length
@@ -870,13 +868,11 @@ export default class NeuralNetwork {
         });
       }
 
-      errorSum += mse(output.map((value, i) => {
-        return target[i] - value;
-      }));
+      errorSum += mse(output.map((value, i) => target[i] - value));
     }
     return {
       error: errorSum / data.length,
-      misclasses: misclasses,
+      misclasses,
       total: data.length
     };
   }
@@ -932,8 +928,7 @@ export default class NeuralNetwork {
         nodes = range(0, this.sizes[layer]);
       }
 
-      for (let j = 0; j < nodes.length; j++) {
-        const node = nodes[j];
+      nodes.forEach((node, j) => {
         layers[layer][node] = {};
 
         if (layer > 0) {
@@ -947,7 +942,7 @@ export default class NeuralNetwork {
             layers[layer][node].weights[k] = this.weights[layer][j][index];
           }
         }
-      }
+      });
     }
     return {
       sizes: this.sizes.slice(0),
