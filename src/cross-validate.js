@@ -168,8 +168,8 @@ export default class CrossValidate {
 
 
     return this.json = {
-      avgs: avgs,
-      stats: stats,
+      avgs,
+      stats,
       sets: results
     };
   }
@@ -182,9 +182,9 @@ export default class CrossValidate {
     return this.json;
   }
 
-  fromJSON(crossValidateJson) {
+  fromJSON({sets}) {
     const Classifier = this.Classifier;
-    const json = crossValidateJson.sets.reduce((prev, cur) => prev.error < cur.error ? prev : cur, {error: Infinity}).network;
+    const json = sets.reduce((prev, cur) => prev.error < cur.error ? prev : cur, {error: Infinity}).network;
     if (Classifier.fromJSON) {
       return Classifier.fromJSON(json);
     }
