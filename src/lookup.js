@@ -6,9 +6,7 @@ export default class lookup {
    * @returns {Object}
    */
   static toTable(hashes) {
-    const hash = hashes.reduce((memo, hash) => {
-      return Object.assign(memo, hash);
-    }, {});
+    const hash = hashes.reduce((memo, hash) => Object.assign(memo, hash), {});
 
     return lookup.toHash(hash);
   }
@@ -21,10 +19,9 @@ export default class lookup {
   static toTable2D(objects2D) {
     const table = {};
     let valueIndex = 0;
-    for (let i = 0; i < objects2D.length; i++) {
-      const objects = objects2D[i];
-      for (let j = 0; j < objects.length; j++) {
-        const object = objects[j];
+
+    for (const objects of objects2D) {
+      for (const object of objects) {
         for (const p in object) {
           if (object.hasOwnProperty(p) && !table.hasOwnProperty(p)) {
             table[p] = valueIndex++;
@@ -32,6 +29,7 @@ export default class lookup {
         }
       }
     }
+
     return table;
   }
 
@@ -53,8 +51,8 @@ export default class lookup {
     let tableIndex = 0;
     for (let dataIndex = 0; dataIndex < data.length; dataIndex++) {
       const input = data[dataIndex].input;
-      for (let i = 0; i < input.length; i++) {
-        const object = input[i];
+
+      for (const object of input) {
         for (let p in object) {
           if (!table.hasOwnProperty(p)) {
             table[p] = tableIndex++;
@@ -83,8 +81,8 @@ export default class lookup {
     let tableIndex = 0;
     for (let dataIndex = 0; dataIndex < data.length; dataIndex++) {
       const output = data[dataIndex].output;
-      for (let i = 0; i < output.length; i++) {
-        const object = output[i];
+
+      for (const object of output) {
         for (let p in object) {
           if (!table.hasOwnProperty(p)) {
             table[p] = tableIndex++;
