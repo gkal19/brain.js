@@ -43,12 +43,12 @@ export default class NeuralNetworkGPU extends NeuralNetwork {
    * @param value
    * @param logErrorRate
    */
-  trainPattern(value, logErrorRate) {
+  trainPattern({input, output}, logErrorRate) {
     // forward propagate
-    this.runInput(value.input);
+    this.runInput(input);
 
     // back propagate
-    this.calculateDeltas(value.output);
+    this.calculateDeltas(output);
     this.adjustWeights();
 
     if (logErrorRate) {
@@ -202,7 +202,7 @@ export default class NeuralNetworkGPU extends NeuralNetwork {
           weights: GPU.alias('addWeights', addWeights),
           changes: GPU.alias('calcChanges', calcChanges)
         },
-        function(previousOutputs, deltas, weights, changes) {
+        (previousOutputs, deltas, weights, changes) => {
           let change = calcChanges(
             changes,
             deltas,
@@ -348,12 +348,10 @@ export default class NeuralNetworkGPU extends NeuralNetwork {
     });
 
     return {
-      data: data.map((set) => {
-        return {
-          input: this.texturizeInputData(set.input),
-          output: texturizeOutputData(set.output)
-        }
-      }),
+      data: data.map(({input, output}) => ({
+        input: this.texturizeInputData(input),
+        output: texturizeOutputData(output)
+      })),
       status,
       endTime
     };
