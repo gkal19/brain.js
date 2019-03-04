@@ -104,7 +104,7 @@ export default class TrainStream extends Writable {
     }
     if (this.callback && (this.i % this.callbackPeriod === 0)) {
       this.callback({
-        error: error,
+        error,
         iterations: this.i
       });
     }
@@ -123,7 +123,7 @@ export default class TrainStream extends Writable {
       // done training
       if (typeof this.doneTrainingCallback === 'function') {
         return this.doneTrainingCallback({
-          error: error,
+          error,
           iterations: this.i
         });
       }
